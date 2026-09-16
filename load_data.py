@@ -1,12 +1,8 @@
 """
-Fase 1: Script de carga de datos
+Script de carga de datos
 Lee el CSV de Kaggle (creditcard.csv) y lo inserta en la tabla
 `transactions` de SQL Server.
-
-Requisitos (instalar antes de correr):
-    pip install pandas sqlalchemy pyodbc
-
-Ajusta la cadena de conexión (SERVER y DATABASE) según tu instalación
+Ajusta la cadena de conexión (SERVER y DATABASE) según mi instalación
 de SQL Server Management Studio.
 """
 
@@ -17,7 +13,6 @@ from dotenv import load_dotenv
 
 # ------------------------------------------------------------------
 # 1. CONFIGURACIÓN - las credenciales se leen desde el archivo .env
-#    (nunca se suben a GitHub, ver .gitignore)
 # ------------------------------------------------------------------
 load_dotenv()  # carga las variables definidas en .env
 
@@ -25,7 +20,7 @@ SERVER = os.getenv("DB_SERVER")
 DATABASE = os.getenv("DB_DATABASE")
 USERNAME = os.getenv("DB_USERNAME")
 PASSWORD = os.getenv("DB_PASSWORD")
-DRIVER = "ODBC+Driver+17+for+SQL+Server"  # revisa cuál driver ODBC tienes instalado
+DRIVER = "ODBC+Driver+17+for+SQL+Server"  
 
 CSV_PATH = "data/raw/creditcard.csv"   # ruta al CSV descargado de Kaggle
 
@@ -67,7 +62,7 @@ df.to_sql(
 print("¡Carga completada!")
 
 # ------------------------------------------------------------------
-# 4. VALIDACIÓN FINAL (Fase 1B del plan)
+# 4. VALIDACIÓN FINAL 
 # ------------------------------------------------------------------
 with engine.connect() as conn:
     result = conn.exec_driver_sql("SELECT COUNT(*) FROM transactions").scalar()

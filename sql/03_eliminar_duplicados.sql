@@ -1,6 +1,6 @@
 -- ============================================================
--- Fase 1 (ampliada): Eliminación de duplicados
--- Proyecto: Detección de Fraude con Tarjetas de Crédito
+--Eliminación de duplicados
+--Proyecto: Detección de Fraude con Tarjetas de Crédito
 -- ============================================================
 
 USE FraudDetectionDB;
