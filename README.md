@@ -58,5 +58,6 @@ métricas del modelo)*
   características de negocio interpretables directamente.
 - El dataset corresponde a transacciones de 2013; el análisis es
   metodológico, no una recomendación operativa actual.
+  
 # proyecto_deteccion_fraude_tarjetas_credito
 Detección de fraude en transacciones con tarjetas de crédito usando SQL Server, Python y Machine Learning, con dashboard interactivo en Power BI y app de predicción en vivo desplegada con Streamlit.
