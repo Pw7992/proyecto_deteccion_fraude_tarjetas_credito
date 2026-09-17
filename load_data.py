@@ -9,14 +9,16 @@ import os
 import pandas as pd
 from conexion_bd import conectar_bd
 
-# 1. LEER EL CSV
+CSV_PATH = "data/raw/creditcard.csv"
+
+# 1. Se lee el archivo csv
 print("Leyendo el archivo CSV...")
 data = pd.read_csv(CSV_PATH)
 print(f"Filas leidas: {len(data):,}")
 print(f"Columnas: {list(data.columns)}")
 
 
-# 2. VERIFICACIONES ANTES DE INSERTAR
+# 2. Verificaciones previas a cargar los datos
 
 print("\nVerificaciones previas a la carga:")
 print(f"- Valores nulos por columna:\n{data.isnull().sum().sum()} nulos en total")
@@ -24,7 +26,7 @@ print(f"- Duplicados: {data.duplicated().sum()} filas duplicadas")
 print(f"- Proporcion de fraude: {data['Class'].mean() * 100:.3f}%")
 
 
-# 3. CONECTAR A LA BASE DE DATOS
+# 3. Conexion a la base de datos
 conexion, cursor = conectar_bd()
 
 if conexion:
@@ -47,7 +49,7 @@ if conexion:
         print("¡Carga completada!")
 
 
-        # 4. VALIDACION FINAL
+        # 4. Validación final
         cursor.execute("SELECT COUNT(*) FROM transactions")
         total_filas = cursor.fetchone()[0]
         print(f"\nFilas ahora en la tabla 'transactions': {total_filas:,}")
