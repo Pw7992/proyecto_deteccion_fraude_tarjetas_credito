@@ -1,7 +1,5 @@
--- ============================================================
--- Fase 1 (ampliada): Verificación de nulos por columna
--- Proyecto: Detección de Fraude con Tarjetas de Crédito
--- ============================================================
+
+-- Verificación de nulos por columna
 
 USE FraudDetectionDB;
 GO
@@ -45,5 +43,5 @@ SELECT
 FROM transactions;
 GO
 
--- Si todas las columnas dan 0, confirmas formalmente (con evidencia en SQL,
+-- Si todas las columnas dan 0, se confirma formalmente (con evidencia en SQL,
 -- no solo en el log de Python) que el dataset no requiere imputación de nulos.

@@ -1,4 +1,4 @@
-#--Eliminación de duplicados
+--Eliminación de duplicados
 
 USE FraudDetectionDB;
 GO
@@ -23,7 +23,7 @@ FROM duplicados
 WHERE rn > 1;
 GO
 
--- 2. Eliminar los duplicados, conservando solo la primera aparición (rn = 1)
+-- Eliminar los duplicados, conservando solo la primera aparición (rn = 1)
 WITH duplicados AS (
     SELECT
         id,
@@ -40,6 +40,6 @@ DELETE FROM duplicados
 WHERE rn > 1;
 GO
 
--- 3. Verificación final
+-- Verificación final
 SELECT COUNT(*) AS filas_despues_de_limpiar FROM transactions;
 GO
