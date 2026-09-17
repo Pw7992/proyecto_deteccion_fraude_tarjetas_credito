@@ -1,7 +1,4 @@
--- ============================================================
---Eliminación de duplicados
---Proyecto: Detección de Fraude con Tarjetas de Crédito
--- ============================================================
+#--Eliminación de duplicados
 
 USE FraudDetectionDB;
 GO
@@ -43,6 +40,6 @@ DELETE FROM duplicados
 WHERE rn > 1;
 GO
 
--- 3. Verificación final: el conteo debe bajar de 284,807 a ~283,726
+-- 3. Verificación final
 SELECT COUNT(*) AS filas_despues_de_limpiar FROM transactions;
 GO

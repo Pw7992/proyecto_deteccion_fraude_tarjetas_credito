@@ -1,7 +1,4 @@
--- ============================================================
 -- Detección de valores atípicos (outliers)
--- Proyecto: Detección de Fraude con Tarjetas de Crédito
--- ============================================================
  
 USE FraudDetectionDB;
 GO

@@ -1,9 +1,7 @@
--- ============================================================
--- Fase 1: Creación de base de datos y tablas
--- Proyecto: Detección de Fraude con Tarjetas de Crédito
--- ============================================================
 
--- 1. Crear la base de datos (ejecutar una sola vez)
+-- Creación de base de datos y tablas
+
+-- 1. Crear la base de datos 
 CREATE DATABASE FraudDetectionDB;
 GO
 
@@ -25,9 +23,7 @@ CREATE TABLE transactions (
 );
 GO
 
--- 3. Tabla de consultas: se llenará desde Streamlit (Fase 6)
---    Queda vacía por ahora, pero la creamos ya para no tocar
---    el modelo de datos más adelante.
+-- 3. Tabla de consultas: se llenará desde Streamlit
 CREATE TABLE consultas_predicciones (
     id              INT IDENTITY(1,1) PRIMARY KEY,
     fecha_hora      DATETIME DEFAULT GETDATE(),

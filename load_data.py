@@ -11,9 +11,9 @@ import pandas as pd
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 
-# ------------------------------------------------------------------
+
 # 1. CONFIGURACIÓN - las credenciales se leen desde el archivo .env
-# ------------------------------------------------------------------
+
 load_dotenv()  # carga las variables definidas en .env
 
 SERVER = os.getenv("DB_SERVER")
@@ -30,23 +30,23 @@ connection_string = (
     f"?driver={DRIVER}"
 )
 
-# ------------------------------------------------------------------
+
 # 2. LEER EL CSV
-# ------------------------------------------------------------------
+
 print("Leyendo el archivo CSV...")
 df = pd.read_csv(CSV_PATH)
 print(f"Filas leídas: {len(df):,}")
 print(f"Columnas: {list(df.columns)}")
 
-# Verificación rápida antes de insertar (validaciones de la Fase 1B)
+# Verificación rápida antes de insertar
 print("\nVerificaciones previas a la carga:")
 print(f"- Valores nulos por columna:\n{df.isnull().sum().sum()} nulos en total")
 print(f"- Duplicados: {df.duplicated().sum()} filas duplicadas")
 print(f"- Proporción de fraude: {df['Class'].mean() * 100:.3f}%")
 
-# ------------------------------------------------------------------
+
 # 3. INSERTAR EN SQL SERVER
-# ------------------------------------------------------------------
+
 print("\nConectando a SQL Server...")
 engine = create_engine(connection_string)
 
@@ -61,9 +61,8 @@ df.to_sql(
 
 print("¡Carga completada!")
 
-# ------------------------------------------------------------------
 # 4. VALIDACIÓN FINAL 
-# ------------------------------------------------------------------
+#__________________________________________________________________
 with engine.connect() as conn:
     result = conn.exec_driver_sql("SELECT COUNT(*) FROM transactions").scalar()
     print(f"\nFilas ahora en la tabla 'transactions': {result:,}")
