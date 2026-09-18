@@ -151,8 +151,7 @@ while seguir_consultando == "s":
         monto = 100.00
  
     # NOTA: por ahora la prediccion se simula de forma aleatoria.
-    # Cuando el modelo de Machine Learning este entrenado (Fase 4),
-    # esta parte se reemplaza por la prediccion real del modelo.
+    # Cuando el modelo de Machine Learning este entrenado se realizará ahí el proceso.
     probabilidad = round(random.uniform(0, 1), 4)
     if probabilidad >= 0.5:
         prediccion = 1
