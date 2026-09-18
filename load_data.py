@@ -6,15 +6,15 @@ y permite registrar consultas nuevas en tiempo real.
 Las credenciales se leen desde el archivo .env (no se escriben aqui
 directamente, por seguridad).
 """
- 
+
 import os
 import random
 import pyodbc
 import pandas as pd
 from dotenv import load_dotenv
- 
+
 load_dotenv()
- 
+
 
 # 1. Configuracion de conexion
 
@@ -22,9 +22,9 @@ SERVER = os.getenv("DB_SERVER")
 DATABASE = os.getenv("DB_DATABASE")
 USERNAME = os.getenv("DB_USERNAME")
 PASSWORD = os.getenv("DB_PASSWORD")
- 
+
 CSV_PATH = "data/raw/creditcard.csv"
- 
+
 CONNECTION_STRING_MASTER = (
     "DRIVER={ODBC Driver 17 for SQL Server};"
     f"SERVER={SERVER};"
@@ -32,7 +32,7 @@ CONNECTION_STRING_MASTER = (
     f"UID={USERNAME};"
     f"PWD={PASSWORD};"
 )
- 
+
 CONNECTION_STRING_DB = (
     "DRIVER={ODBC Driver 17 for SQL Server};"
     f"SERVER={SERVER};"
@@ -40,33 +40,33 @@ CONNECTION_STRING_DB = (
     f"UID={USERNAME};"
     f"PWD={PASSWORD};"
 )
- 
+
 
 # 2. Crear la base de datos (si no existe)
 
 print(f"Verificando/creando base de datos '{DATABASE}'...")
- 
+
 conexion_master = pyodbc.connect(CONNECTION_STRING_MASTER, autocommit=True)
 cursor_master = conexion_master.cursor()
- 
+
 cursor_master.execute(f"""
     IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '{DATABASE}')
     BEGIN
         CREATE DATABASE {DATABASE};
     END
 """)
- 
+
 conexion_master.close()
 print("Base de datos lista.")
- 
+
 
 # 3. Crear las tablas (si no existen)
 
 conexion = pyodbc.connect(CONNECTION_STRING_DB, autocommit=True)
 cursor = conexion.cursor()
- 
+
 print("Verificando/creando tablas...")
- 
+
 cursor.execute("""
     IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'transactions')
     BEGIN
@@ -84,7 +84,7 @@ cursor.execute("""
         );
     END
 """)
- 
+
 cursor.execute("""
     IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'consultas_predicciones')
     BEGIN
@@ -98,20 +98,20 @@ cursor.execute("""
         );
     END
 """)
- 
+
 print("Tablas listas.")
- 
+
 
 # 4. Cargar los datos historicos (solo si la tabla esta vacia)
 
 cursor.execute("SELECT COUNT(*) FROM transactions")
 total_actual = cursor.fetchone()[0]
- 
+
 if total_actual == 0:
     print("La tabla esta vacia. Cargando datos del CSV...")
     data = pd.read_csv(CSV_PATH)
     print(f"Filas leidas del CSV: {len(data):,}")
- 
+
     query_insertar_transaccion = """
         INSERT INTO transactions (
             [Time], V1, V2, V3, V4, V5, V6, V7, V8, V9, V10,
@@ -119,52 +119,53 @@ if total_actual == 0:
             V21, V22, V23, V24, V25, V26, V27, V28, Amount, Class
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
- 
+
     contador = 0
     for indice, fila in data.iterrows():
         cursor.execute(query_insertar_transaccion, tuple(fila))
         contador = contador + 1
         if contador % 20000 == 0:
             print(f"  {contador:,} filas insertadas hasta ahora...")
- 
+
     conexion.commit()
     print(f"Carga completada: {contador:,} filas insertadas.")
 else:
     print(f"La tabla ya tiene {total_actual:,} filas, no se vuelve a cargar.")
- 
+
 
 # 5. Consulta en tiempo real (registrar una prediccion nueva)
 
 print("\n" + "=" * 50)
 print(" Registro de consulta en tiempo real")
 print("=" * 50)
- 
+
 seguir_consultando = "s"
- 
+
 while seguir_consultando == "s":
     monto_texto = input("\nIngresa el monto de la transaccion a consultar: ")
- 
+
     try:
         monto = float(monto_texto)
     except ValueError:
         print("Monto invalido, se usara 100.00 por defecto.")
         monto = 100.00
- 
+
     # NOTA: por ahora la prediccion se simula de forma aleatoria.
-    # Cuando el modelo de Machine Learning este entrenado se realizará ahí el proceso.
+    # Cuando el modelo de Machine Learning este entrenado (Fase 4),
+    # esta parte se reemplaza por la prediccion real del modelo.
     probabilidad = round(random.uniform(0, 1), 4)
     if probabilidad >= 0.5:
         prediccion = 1
     else:
         prediccion = 0
- 
+
     print(f"Monto consultado: {monto}")
     if prediccion == 1:
         print("Resultado: FRAUDE PROBABLE")
     else:
         print("Resultado: LEGITIMA")
     print(f"Probabilidad de fraude: {probabilidad * 100:.2f}%")
- 
+
     cursor.execute(
         """
         INSERT INTO consultas_predicciones (amount, prediccion, probabilidad, origen)
@@ -174,11 +175,28 @@ while seguir_consultando == "s":
     )
     conexion.commit()
     print("Consulta guardada en la base de datos.")
- 
-    seguir_consultando = input("\nQuieres registrar otra consulta? (s/n): ").lower()
- 
 
-# 6. Cerrar conexion
+    seguir_consultando = input("\nQuieres registrar otra consulta? (s/n): ").lower()
+
+
+# 6. Consultar tablas (ejemplo simple de lectura de datos)
+
+print("\n" + "=" * 50)
+print(" Consulta de tablas")
+print("=" * 50)
+
+print("\nPrimeras 5 transacciones registradas:")
+cursor.execute("SELECT TOP 5 id, Amount, Class FROM transactions ORDER BY id")
+filas = cursor.fetchall()
+for fila in filas:
+    print(fila)
+
+cursor.execute("SELECT COUNT(*) FROM consultas_predicciones")
+total_consultas = cursor.fetchone()[0]
+print(f"\nTotal de consultas registradas hasta ahora: {total_consultas}")
+
+
+# 7. Cerrar conexion
 
 cursor.close()
 conexion.close()
