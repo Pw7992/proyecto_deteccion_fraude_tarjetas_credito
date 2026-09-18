@@ -111,7 +111,19 @@ if total_actual == 0:
     print("La tabla esta vacia. Cargando datos del CSV...")
     data = pd.read_csv(CSV_PATH)
     print(f"Filas leidas del CSV: {len(data):,}")
-
+ 
+    # 5. Limpieza de datos (nulos y duplicados) antes de insertar en SSMS
+    
+    print("\nRevisando valores nulos por columna:")
+    print(data.isnull().sum())
+ 
+    data = data.dropna()
+    print(f"Filas despues de eliminar nulos: {len(data):,}")
+ 
+    print(f"\nFilas duplicadas encontradas: {data.duplicated().sum()}")
+    data = data.drop_duplicates()
+    print(f"Filas despues de eliminar duplicados: {len(data):,}")
+ 
     query_insertar_transaccion = """
         INSERT INTO transactions (
             [Time], V1, V2, V3, V4, V5, V6, V7, V8, V9, V10,
@@ -119,21 +131,22 @@ if total_actual == 0:
             V21, V22, V23, V24, V25, V26, V27, V28, Amount, Class
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
-
+ 
     contador = 0
     for indice, fila in data.iterrows():
         cursor.execute(query_insertar_transaccion, tuple(fila))
         contador = contador + 1
         if contador % 20000 == 0:
             print(f"  {contador:,} filas insertadas hasta ahora...")
-
+ 
     conexion.commit()
-    print(f"Carga completada: {contador:,} filas insertadas.")
+    print(f"Carga completada: {contador:,} filas insertadas (ya limpias).")
 else:
     print(f"La tabla ya tiene {total_actual:,} filas, no se vuelve a cargar.")
+ 
 
 
-# 5. Consulta en tiempo real (registrar una prediccion nueva)
+# 6. Consulta en tiempo real (registrar una prediccion nueva)
 
 print("\n" + "=" * 50)
 print(" Registro de consulta en tiempo real")
@@ -179,7 +192,7 @@ while seguir_consultando == "s":
     seguir_consultando = input("\nQuieres registrar otra consulta? (s/n): ").lower()
 
 
-# 6. Consultar tablas (ejemplo simple de lectura de datos)
+# 7. Consultar tablas (ejemplo simple de lectura de datos)
 
 print("\n" + "=" * 50)
 print(" Consulta de tablas")
@@ -196,7 +209,7 @@ total_consultas = cursor.fetchone()[0]
 print(f"\nTotal de consultas registradas hasta ahora: {total_consultas}")
 
 
-# 7. Cerrar conexion
+# 8. Cerrar conexion
 
 cursor.close()
 conexion.close()
