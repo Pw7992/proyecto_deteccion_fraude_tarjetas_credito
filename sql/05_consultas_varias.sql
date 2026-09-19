@@ -35,3 +35,7 @@ SELECT Class, COUNT(*) AS cantidad
 FROM transactions
 GROUP BY Class;
 GO
+
+-- 8. Contar cuantos datos tengo
+SELECT COUNT(Amount) AS cantidad_datos
+FROM transactions;
